@@ -90,7 +90,6 @@ if st.button("Generar Reporte", type="primary"):
                 
                 # Renderizar secciones
                 report_sections.render_global_metrics(df)
-                report_sections.render_user_summary(df)
                 report_sections.render_daily_charts(df, days)
                 report_sections.render_detail_tables(df, jira_url)
                     
