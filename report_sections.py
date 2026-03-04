@@ -14,20 +14,28 @@ def render_global_metrics(df: pd.DataFrame):
     col_m3.metric("Promedio p/usuario", f"{total_hours / num_users:.2f} h")
 
 
+def render_user_summary(df: pd.DataFrame):
+    """Muestra gráficos de resumen por usuario (torta + barras)."""
+    st.subheader("Resumen por Usuario")
+    df_summary = df.groupby("usuario")["hours"].sum().reset_index()
+    df_summary.columns = ["Usuario", "Horas"]
+    df_summary = df_summary.sort_values("Horas", ascending=False)
+
+    col1, col2 = st.columns(2)
+    with col1:
+        charts.render_pie_chart(df_summary)
+    with col2:
+        charts.render_bar_chart(df_summary)
+
+
 def render_daily_charts(df: pd.DataFrame, days: int):
-    """Muestra el gráfico diario con pestañas por usuario."""
+    """Muestra el gráfico diario consolidado para todos los usuarios."""
     st.subheader("Gráfico Diario")
-    user_names = sorted(df["usuario"].unique().tolist())
-    tabs = st.tabs(user_names)
-
+    
     df_daily = df.groupby(["date", "usuario"])["hours"].sum().reset_index()
-
-    for i, user_name in enumerate(user_names):
-        with tabs[i]:
-            df_user = df_daily[df_daily["usuario"] == user_name]
-            charts.render_daily_chart(
-                df_user, f"Horas por día - {user_name} (Últimos {days} días)"
-            )
+    charts.render_daily_chart(
+        df_daily, f"Horas por día - Todos los usuarios (Últimos {days} días)"
+    )
 
 
 def render_detail_tables(df: pd.DataFrame, jira_url: str):

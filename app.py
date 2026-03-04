@@ -6,6 +6,7 @@ from dotenv import load_dotenv
 import jira_report
 import data_loader
 import report_sections
+import re
 
 # Cargar variables de entorno desde .env
 load_dotenv()
@@ -68,7 +69,7 @@ with st.sidebar:
     st.caption("v1.1.0")
 
 # Parsear lista de usuarios
-author_list = [a.strip() for a in authors_input.splitlines() if a.strip()] if authors_input else []
+author_list = [a.strip() for a in re.split(r'[,\n]', authors_input) if a.strip()] if authors_input else []
 
 if st.button("Generar Reporte", type="primary"):
     if not jira_url or not jira_token or not project_key or not author_list:
@@ -90,6 +91,7 @@ if st.button("Generar Reporte", type="primary"):
                 
                 # Renderizar secciones
                 report_sections.render_global_metrics(df)
+                report_sections.render_user_summary(df)
                 report_sections.render_daily_charts(df, days)
                 report_sections.render_detail_tables(df, jira_url)
                     

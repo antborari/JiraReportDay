@@ -117,9 +117,10 @@ def get_worklogs_filtered(client, project_key, author_name, days=30, date_start=
         date_limit_obj = date_n_days_ago.replace(hour=0, minute=0, second=0, microsecond=0)
         date_end_obj = None
     
-    # JQL: Buscar issues en el proyecto que hayan sido actualizadas recientemente
-    # Esto traerá issues donde se haya logueado tiempo (u otros cambios) recientemente.
-    jql = f'project = "{project_key}" AND updatedDate >= "{date_str}"'
+    # JQL: Buscar issues en los proyectos (soporta múltiples separados por coma) que hayan sido actualizadas recientemente
+    project_keys = [p.strip() for p in project_key.split(',') if p.strip()]
+    projects_str = ", ".join(f'"{p}"' for p in project_keys)
+    jql = f'project IN ({projects_str}) AND updatedDate >= "{date_str}"'
     
     print(f"Ejecutando JQL: {jql}")
     
